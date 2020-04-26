@@ -1,0 +1,96 @@
+version: "3.7"
+services:
+  pia:
+    image: qmcgaw/private-internet-access
+    container_name: pia
+    cap_add:
+      - NET_ADMIN
+    network_mode: bridge
+    init: true
+    ports:
+      - 8888:8888/tcp
+      - 8388:8388/tcp
+      - 8388:8388/udp
+      - 9091:9091
+      - 7878:7878
+      - 8989:8989
+      - 9117:9117
+    # command:
+    volumes:
+      - ~/docker-config/transmission:/config
+    environment:
+      # PIA Config
+      - USER=
+      - PASSWORD=
+      - PROTOCOL=udp      
+      - REGION=DE Berlin
+      - PIA_ENCRYPTION=strong
+      - PORT_FORWARDING=on
+      - PORT_FORWARDING_STATUS_FILE=/config/forwarded_port
+      # DNS over TLS
+      - DOT=on
+      - DOT_PROVIDERS=cloudflare
+      - DOT_IPV6=on
+      - DOT_VERBOSITY=1
+      - BLOCK_MALICIOUS=on
+      - BLOCK_SURVEILLANCE=off
+      - BLOCK_ADS=off
+      - UNBLOCK=
+      # Firewall
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    restart: always
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    network_mode: "service:pia"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - TRANSMISSION_WEB_HOME=/transmission-web-control/
+    volumes:
+      - ~/docker-config/transmission:/config
+      - /media/storage/downloads:/downloads
+      - /media/storage/downloads/watch:/watch
+      - /media/storage/docker/init/scripts/transmission_start_up:/config/custom-cont-init.d
+    restart: "no"
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    network_mode: "service:pia"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - ~/docker-config/sonarr:/config
+      - /media/storage/tv:/tv
+      - /media/storage/downloads:/downloads
+    restart: "no"
+  radarr:
+    image: linuxserver/radarrdocker
+    container_name: radarr
+    network_mode: "service:pia"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - ~/docker-config/radarr:/config
+      - /media/storage/movie:/movies
+      - /media/storage/downloads:/downloads
+    restart: "no"
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    network_mode: "service:pia"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - ~/docker-config/jackett:/config
+      - /media/storage/downloads:/downloads
+    restart: "no"
