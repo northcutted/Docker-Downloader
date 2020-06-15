@@ -87,6 +87,7 @@ services:
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
+    network_mode: "service:pia"
     environment:
       - PUID=1000
       - PGID=1000
@@ -111,6 +112,7 @@ services:
   mylar:
     image: linuxserver/mylar
     container_name: mylar
+    network_mode: "service:pia"
     environment:
       - PUID=1000
       - PGID=1000
