@@ -19,11 +19,10 @@ services:
     volumes:
       - ~/docker-config/transmission:/config
     environment:
-      # PIA Config
       - USER=
       - PASSWORD=
       - PROTOCOL=udp      
-      - REGION=DE Berlin
+      - REGION=CA Vancouver
       - PIA_ENCRYPTION=strong
       - PORT_FORWARDING=on
       - PORT_FORWARDING_STATUS_FILE=/config/forwarded_port
@@ -37,6 +36,7 @@ services:
       - BLOCK_ADS=off
       - UNBLOCK=
       # Firewall
+      - EXTRA_SUBNETS=192.168.23.0/24
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
@@ -54,7 +54,7 @@ services:
       - ~/docker-config/transmission:/config
       - /media/storage/downloads:/downloads
       - /media/storage/downloads/watch:/watch
-      - /media/storage/docker/init/scripts/transmission_start_up:/config/custom-cont-init.d
+      - ~/docker-config/init/scripts:/config/custom-cont-init.d
     restart: "no"
   sonarr:
     image: linuxserver/sonarr
@@ -70,7 +70,7 @@ services:
       - /media/storage/downloads:/downloads
     restart: "no"
   radarr:
-    image: linuxserver/radarrdocker
+    image: linuxserver/radarr
     container_name: radarr
     network_mode: "service:pia"
     environment:
