@@ -13,7 +13,9 @@ services:
       - 8388:8388/udp
       - 9091:9091
       - 7878:7878
+      - 6767:6767
       - 8989:8989
+      - 8090:8090
       - 9117:9117
     # command:
     volumes:
@@ -82,6 +84,18 @@ services:
       - /media/storage/movie:/movies
       - /media/storage/downloads:/downloads
     restart: "no"
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - ~/docker-config/bazarr:/config
+      - /media/storage/movie:/movies
+      - /media/storage/tv:/tv
+    restart: "no"
   jackett:
     image: linuxserver/jackett
     container_name: jackett
@@ -92,5 +106,16 @@ services:
       - TZ=America/Chicago
     volumes:
       - ~/docker-config/jackett:/config
+      - /media/storage/downloads:/downloads
+    restart: "no"
+  mylar:
+    image: linuxserver/mylar
+    container_name: mylar
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ~/docker-config/mylar:/config
+      - /media/storage/comics:/comics
       - /media/storage/downloads:/downloads
     restart: "no"
