@@ -30,6 +30,8 @@ function setUpWorkspace () {
     mkdir -p $PATH_TO_DOCKER_CONFIG/pia
     mkdir -p $PATH_TO_DOCKER_CONFIG/radarr
     mkdir -p $PATH_TO_DOCKER_CONFIG/sonarr
+    mkdir -p $PATH_TO_DOCKER_CONFIG/bazarr
+    mkdir -p $PATH_TO_DOCKER_CONFIG/mylar
     mkdir -p $PATH_TO_DOCKER_CONFIG/transmission
     echo_time "Creating directory structure...DONE"
 
@@ -54,7 +56,7 @@ function setUpDockerComposeFile () {
         echo_time "Updating PIA Credintials...DONE"
 
         echo_time "Updating docker-compose.yml to reflect user paths.."
-        sed -i "s/~/docker-config/$PATH_TO_DOCKER_CONFIG/g" $PATH_TO_DOCKER_CONFIG/init/docker-compose.yml
+        sed -i "s|~/docker-config|$PATH_TO_DOCKER_CONFIG|g" $PATH_TO_DOCKER_CONFIG/init/docker-compose.yml
         echo_time "Updating docker-compose.yml to reflect user paths...DONE"
 
     fi
@@ -76,11 +78,13 @@ function setUpPortForwardScript () {
 function cleanUp () {
     # Clean up Old Containers
     echo_time "Stopping containers.."
-    docker stop jackett
-    docker stop sonarr
-    docker stop radarr
-    docker stop transmission
-    docker stop pia
+    docker stop jackett &&
+    docker stop bazarr &&
+    docker stop sonarr &&
+    docker stop radarr &&
+    docker stop mylar &&
+    docker stop transmission &&
+    docker stop pia > /dev/null
     echo_time "Stopping containers...DONE"
 
     echo_time "Pruning all containers.."
@@ -104,6 +108,7 @@ function setup () {
     echo_time "Stopping transmission.."
     docker stop sonarr
     docker stop radarr
+    docker stop mylar
     docker stop transmission
     echo_time "Stopping transmission...DONE"
     echo_time "Removing transmission.."
@@ -130,7 +135,7 @@ function setup () {
 }
 
 function init () {
-    oldPort="0"
+    oldPort=0
     if test -f "$PATH_TO_DOCKER_CONFIG/transmission/forwarded_port"; 
     then
         oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/forwarded_port)
@@ -138,8 +143,11 @@ function init () {
 
     startContainers
     echo_time "Forwarding Port.."
-    #TODO: Proper Check
-    sleep 7s
+    until [ -f $PATH_TO_DOCKER_CONFIG/transmission/forwarded_port ]
+    do
+        sleep 1
+        echo_time "Checking Port Forwarding status..."
+    done
     echo_time "Forwarding Port...DONE"
 
     newPort=`cat $PATH_TO_DOCKER_CONFIG/transmission/forwarded_port`
