@@ -12,7 +12,7 @@
 PATH_TO_DOCKER_CONFIG=${1:="./docker-config"}
 PIA_USER=$2
 PIA_PASSWORD=$3
-PATH_TO_LOG_FILE=PATH_TO_DOCKER_CONFIG/download-box.log   
+PATH_TO_LOG_FILE=$PATH_TO_DOCKER_CONFIG/download-box.log   
 # Logger
 exec 2>&1 | tee ${PATH_TO_LOG_FILE}
 
