@@ -115,19 +115,21 @@ function setup () {
     docker rm transmission
     echo_time "Removing transmission...DONE"
     
-    # Wait until VPN is healthy
+    # Wait until VPN is healthy (NOTE: Helath check too slow, sleep 30 sec until fixed)
     # If this is the case then "docker inspect pia | grep '"Status": "healthy"'" returns exit code: 0
-    docker inspect pia | grep '"Status": "healthy"'
-    is_healthy=$?
-    # Until $is_healthy equals zero...
-    until [ $is_healthy -eq 0 ]
-    do
-        # Check the health of the container every 5 seconds until it is healthy
-        echo_time "Waiting for PIA status to become healthy.."
-        sleep 5
-        docker inspect pia | grep '"Status": "healthy"'
-        is_healthy=$?
-    done
+    # docker inspect pia | grep '"Status": "healthy"'
+    # is_healthy=$?
+    # # Until $is_healthy equals zero...
+    # until [ $is_healthy -eq 0 ]
+    # do
+    #     # Check the health of the container every 5 seconds until it is healthy
+    #     echo_time "Waiting for PIA status to become healthy.."
+    #     sleep 5
+    #     docker inspect pia | grep '"Status": "healthy"'
+    #     is_healthy=$?
+    # done
+    echo_time "Waiting for PIA status to become healthy.."
+    sleep 30
     echo_time "Waiting for PIA status to become healthy...DONE"
 
     # Start Transmission with pia port written to file
