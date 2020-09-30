@@ -1,67 +1,54 @@
 version: "3.7"
 services:
-  pia:
-    image: qmcgaw/private-internet-access
-    container_name: pia
+  vpn:
+    image: thrnz/docker-wireguard-pia
+    volumes:
+        # Auth token is stored here
+        - ~/docker-config/pia:/pia
+        # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
+        - ~/docker-config/pia-shared:/pia-shared
     cap_add:
-      - NET_ADMIN
-    network_mode: bridge
-    init: true
+        - NET_ADMIN
+        # SYS_MODULE might not be needed with a 5.6+ kernel?
+        - SYS_MODULE
     ports:
-      - 8888:8888/tcp
-      - 8388:8388/tcp
-      - 8388:8388/udp
-      - 9091:9091
-      - 7878:7878
-      - 6767:6767
-      - 8989:8989
-      - 8090:8090
-      - 9117:9117
-    # command:
-    volumes:
-      - ~/docker-config/transmission:/config
+        - 8888:8888/tcp
+        - 8388:8388/tcp
+        - 8388:8388/udp
+        - 9091:9091
+        - 7878:7878
+        - 6767:6767
+        - 8989:8989
+        - 8090:8090
+        - 9117:9117
     environment:
-      - USER=
-      - PASSWORD=
-      - PROTOCOL=udp      
-      - REGION=CA Vancouver
-      - PIA_ENCRYPTION=strong
-      - PORT_FORWARDING=on
-      - PORT_FORWARDING_STATUS_FILE=/config/forwarded_port
-      # DNS over TLS
-      - DOT=on
-      - DOT_PROVIDERS=cloudflare
-      - DOT_IPV6=on
-      - DOT_VERBOSITY=1
-      - BLOCK_MALICIOUS=on
-      - BLOCK_SURVEILLANCE=off
-      - BLOCK_ADS=off
-      - UNBLOCK=
-      # Firewall
-      - EXTRA_SUBNETS=192.168.23.0/24
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-    restart: always
-  transmission:
-    image: linuxserver/transmission
-    container_name: transmission
-    network_mode: "service:pia"
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Chicago
-      - TRANSMISSION_WEB_HOME=/transmission-web-control/
-    volumes:
-      - ~/docker-config/transmission:/config
-      - /media/storage/downloads:/downloads
-      - /media/storage/downloads/watch:/watch
-      - ~/docker-config/init/scripts:/config/custom-cont-init.d
+        #- LOCAL_NETWORK=192.168.1.0/24
+        - LOC=swiss
+        - USER=
+        - PASS=
+        #- KEEPALIVE=25
+        - PORT_FORWARDING=1
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Chicago
+    sysctls:
+        # wg-quick fails to set this without --privileged, so set it here instead if needed
+        - net.ipv4.conf.all.src_valid_mark=1
+        # May as well disable ipv6. Should be blocked anyway.
+        - net.ipv6.conf.default.disable_ipv6=1
+        - net.ipv6.conf.all.disable_ipv6=1
+        - net.ipv6.conf.lo.disable_ipv6=1
+    # The container has no recovery logic. Use a healthcheck to catch disconnects.
+    healthcheck:
+        test: ping -c 1 www.google.com || exit 1
+        interval: 30s
+        timeout: 10s
+        retries: 3
     restart: "no"
-  sonarr:
+  sonar:
     image: linuxserver/sonarr
     container_name: sonarr
-    network_mode: "service:pia"
+    network_mode: "service:vpn"
     environment:
       - PUID=1000
       - PGID=1000
@@ -74,7 +61,7 @@ services:
   radarr:
     image: linuxserver/radarr
     container_name: radarr
-    network_mode: "service:pia"
+    network_mode: "service:vpn"
     environment:
       - PUID=1000
       - PGID=1000
@@ -87,7 +74,7 @@ services:
   bazarr:
     image: linuxserver/bazarr
     container_name: bazarr
-    network_mode: "service:pia"
+    network_mode: "service:vpn"
     environment:
       - PUID=1000
       - PGID=1000
@@ -100,7 +87,7 @@ services:
   jackett:
     image: linuxserver/jackett
     container_name: jackett
-    network_mode: "service:pia"
+    network_mode: "service:vpn"
     environment:
       - PUID=1000
       - PGID=1000
@@ -112,7 +99,7 @@ services:
   mylar:
     image: linuxserver/mylar
     container_name: mylar
-    network_mode: "service:pia"
+    network_mode: "service:vpn"
     environment:
       - PUID=1000
       - PGID=1000
