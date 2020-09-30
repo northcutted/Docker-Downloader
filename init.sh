@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Constants
+PATH_TO_DOCKER_CONFIG=${1:="~/docker-config"}
+
+echo_time() {
+    date +"%H:%M $(printf "%s " "$@" | sed 's/%/%%/g')"
+}
 
 function setUpWorkspace () {
     echo_time "Creating Workspace.."
