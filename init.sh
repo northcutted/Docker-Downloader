@@ -14,13 +14,14 @@ function setUpWorkspace () {
     mkdir -p $PATH_TO_DOCKER_CONFIG/init/scripts
     mkdir -p $PATH_TO_DOCKER_CONFIG/jackett
     mkdir -p $PATH_TO_DOCKER_CONFIG/pia
-    mkdir -p $PATH_TO_DOCKER_CONFIG/pia-shared
     mkdir -p $PATH_TO_DOCKER_CONFIG/radarr
     mkdir -p $PATH_TO_DOCKER_CONFIG/sonarr
     mkdir -p $PATH_TO_DOCKER_CONFIG/bazarr
     mkdir -p $PATH_TO_DOCKER_CONFIG/mylar
     mkdir -p $PATH_TO_DOCKER_CONFIG/transmission
     echo_time "Creating directory structure...DONE"
+
+    chmod +x set-port.sh
 
     echo_time "Creating Workspace...DONE"
 }
@@ -34,26 +35,38 @@ function cleanUp () {
     docker rm $(docker ps -aq)
     echo_time "Removing all containers...DONE"
 
-    echo_time "Removing all images.."
-    docker rmi $(docker images -q)
-    echo_time "Removing all images...DONE"
+    # echo_time "Removing all images.."
+    # docker rmi $(docker images -q)
+    # echo_time "Removing all images...DONE"
 }
 
 function startContainers () {
     echo_time "Updating and starting containers.."
-    cd $PATH_TO_DOCKER_CONFIG/init && docker-compose up -d
+    docker-compose up -d
     echo_time "Updating and starting containers...DONE"
 }
 
 
 function init () {
     oldPort=0
-    if test -f "$PATH_TO_DOCKER_CONFIG/transmission/forwarded_port"; 
+    if test -f "$PATH_TO_DOCKER_CONFIG/transmission/port.dat"; 
     then
-        oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/forwarded_port)
+        oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat)
     fi
 
     startContainers
+    echo_time "Forwarding Port.."
+    until [ -f $PATH_TO_DOCKER_CONFIG/transmission/port.dat ]
+    do
+        sleep 1
+        echo_time "Checking Port Forwarding status..."
+    done
+    docker restart transmission
+    echo_time "Forwarding Port...DONE"
+
+    newPort=`cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat`
+    echo "Old Port: " $oldPort
+    echo "New Port: " $newPort
 }
 
 
