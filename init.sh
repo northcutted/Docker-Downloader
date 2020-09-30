@@ -55,3 +55,8 @@ function init () {
 
     startContainers
 }
+
+
+setUpWorkspace
+cleanUp
+init
