@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Constants
-PATH_TO_DOCKER_CONFIG=${1:="~/docker-config"}
-
+PATH_TO_DOCKER_CONFIG=${1:-"~/docker-config"}
+echo "Path to Docker Config: $PATH_TO_DOCKER_CONFIG"
 echo_time() {
     date +"%H:%M $(printf "%s " "$@" | sed 's/%/%%/g')"
 }
