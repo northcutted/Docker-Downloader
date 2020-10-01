@@ -23,7 +23,7 @@ services:
         - 9117:9117
     environment:
        # - LOCAL_NETWORK=192.168.1.0/24
-        - LOC=swiss
+        - LOC=ca_ontario
         - USER=
         - PASS=
         #- KEEPALIVE=25
