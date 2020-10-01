@@ -22,6 +22,7 @@ function setUpWorkspace () {
     echo_time "Creating directory structure...DONE"
 
     chmod +x set-port.sh
+    chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
 
     echo_time "Creating Workspace...DONE"
 }
