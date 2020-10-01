@@ -23,6 +23,7 @@ function setUpWorkspace () {
 
     sudo chmod +x set-port.sh
     sudo chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
+    cp set-port.sh $PATH_TO_DOCKER_CONFIG/init/scripts/set-port.sh
 
     echo_time "Creating Workspace...DONE"
 }
