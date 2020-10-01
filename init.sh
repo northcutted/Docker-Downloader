@@ -21,8 +21,8 @@ function setUpWorkspace () {
     mkdir -p $PATH_TO_DOCKER_CONFIG/transmission
     echo_time "Creating directory structure...DONE"
 
-    chmod +x set-port.sh
-    chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
+    sudo chmod +x set-port.sh
+    sudo chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
 
     echo_time "Creating Workspace...DONE"
 }
@@ -53,12 +53,12 @@ function init () {
     if test -f "$PATH_TO_DOCKER_CONFIG/transmission/port.dat"; 
     then
         oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat)
+        rm $PATH_TO_DOCKER_CONFIG/transmission/port.dat
     fi
 
     startContainers
     echo_time "Forwarding Port.."
-    until [ -f $PATH_TO_DOCKER_CONFIG/transmission/port.dat ]
-    do
+    while [ ! -f $PATH_TO_DOCKER_CONFIG/transmission/port.dat ]
         sleep 1
         echo_time "Checking Port Forwarding status..."
     done
@@ -69,7 +69,6 @@ function init () {
     echo "Old Port: " $oldPort
     echo "New Port: " $newPort
 }
-
 
 setUpWorkspace
 cleanUp
