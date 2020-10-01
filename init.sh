@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Download Box Set Up
+
+# To run when box starts:
+# Make sure script is executable
+# run 'crontab -e'
+# add '@reboot sleep 10 && /home/downloadbox/docker-config/init/startseedbox.sh' to the crontab
+# ????
+# profit
+
 #Constants
 PATH_TO_DOCKER_CONFIG=${1:-"~/docker-config"}
 echo "Path to Docker Config: $PATH_TO_DOCKER_CONFIG"
@@ -21,8 +30,8 @@ function setUpWorkspace () {
     mkdir -p $PATH_TO_DOCKER_CONFIG/transmission
     echo_time "Creating directory structure...DONE"
 
-    sudo chmod +x set-port.sh
-    sudo chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
+    #sudo chmod +x set-port.sh
+    #sudo chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
     cp set-port.sh $PATH_TO_DOCKER_CONFIG/init/scripts/set-port.sh
 
     echo_time "Creating Workspace...DONE"
@@ -51,7 +60,7 @@ function startContainers () {
 
 function init () {
     oldPort=0
-    if test -f "$PATH_TO_DOCKER_CONFIG/transmission/port.dat"; 
+    if test -f "$PATH_TO_DOCKER_CONFIG/transmission/port.dat";
     then
         oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat)
         rm $PATH_TO_DOCKER_CONFIG/transmission/port.dat

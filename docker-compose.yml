@@ -22,7 +22,7 @@ services:
         - 8090:8090
         - 9117:9117
     environment:
-        #- LOCAL_NETWORK=192.168.1.0/24
+       # - LOCAL_NETWORK=192.168.1.0/24
         - LOC=swiss
         - USER=
         - PASS=
