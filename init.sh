@@ -59,6 +59,7 @@ function init () {
     startContainers
     echo_time "Forwarding Port.."
     while [ ! -f $PATH_TO_DOCKER_CONFIG/transmission/port.dat ]
+    do
         sleep 1
         echo_time "Checking Port Forwarding status..."
     done
