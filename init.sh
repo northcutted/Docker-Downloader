@@ -35,7 +35,7 @@ function setUpWorkspace () {
         sed -i "s|INSTALL_LOCATION|$INSTALL_LOCATION|g" $INSTALL_LOCATION/docker-compose.yml
         sed -i "s|MEDIA_LOCATION|$MEDIA_LOCATION|g" $INSTALL_LOCATION/docker-compose.yml
         echo_time "Installing Compose file...DONE"
-        echo "compose file installed at $INSTALL_LOCATION/docker-compose.yml\n"
+        echo "compose file installed at $INSTALL_LOCATION/docker-compose.yml"
         echo "The install will exit, please add your PIA username and password to the file, then re run this script."
         exit 0
     fi
