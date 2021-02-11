@@ -7,7 +7,7 @@
 # add @reboot sleep 5 && /path/to/init.sh INSTALL_LOCATION  MEDIA_LOCATION to the crontab
 # This will start the stack at boot.
 
-INSTALL_LOCATION=${1:-"~/docker_downloader_home"}
+INSTALL_LOCATION=${1:-"/docker_downloader_home"}
 MEDIA_LOCATION=${2:-"/media/storage"}
 echo "Path to Docker Config: $INSTALL_LOCATION"
 
