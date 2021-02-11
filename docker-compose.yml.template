@@ -1,7 +1,8 @@
 version: "3.7"
 services:
   vpn:
-    image: thrnz/docker-wireguard-pia
+  # See: https://github.com/thrnz/docker-wireguard-pia
+    image: thrnz/docker-wireguard-pia:latest
     volumes:
         # Auth token is stored here
         - INSTALL_LOCATION/pia:/pia
@@ -46,7 +47,7 @@ services:
         retries: 3
     restart: "no"
   transmission:
-    image: linuxserver/transmission
+    image: linuxserver/transmission:latest
     container_name: transmission
     network_mode: "service:vpn"
     environment:
@@ -61,7 +62,7 @@ services:
       - INSTALL_LOCATION/init/scripts:/config/custom-cont-init.d
     restart: "no"
   sonar:
-    image: linuxserver/sonarr
+    image: linuxserver/sonarr:latest
     container_name: sonarr
     network_mode: "service:vpn"
     environment:
@@ -87,7 +88,7 @@ services:
       - MEDIA_LOCATION/downloads:/downloads
     restart: "no"
   bazarr:
-    image: linuxserver/bazarr
+    image: linuxserver/bazarr:latest
     container_name: bazarr
     network_mode: "service:vpn"
     environment:
@@ -100,7 +101,7 @@ services:
       - MEDIA_LOCATION/tv:/tv
     restart: "no"
   jackett:
-    image: linuxserver/jackett
+    image: linuxserver/jackett:latest
     container_name: jackett
     network_mode: "service:vpn"
     environment:
@@ -112,7 +113,7 @@ services:
       - MEDIA_LOCATION/downloads:/downloads
     restart: "no"
   mylar:
-    image: linuxserver/mylar
+    image: linuxserver/mylar:latest
     container_name: mylar
     network_mode: "service:vpn"
     environment:
