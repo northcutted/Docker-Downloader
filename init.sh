@@ -29,16 +29,19 @@ function setUpWorkspace () {
     mkdir -p $INSTALL_LOCATION/transmission
     echo_time "Creating directory structure...DONE"
 
-    echo_time "Installing Compose file.."
-    cp docker-compose.yml.template $INSTALL_LOCATION/docker-compose.yml
-    sed -i "s/<-%INSTALL_LOCATION%->/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
-    sed -i "s/<-%MEDIA_LOCATION%->/MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
-    echo_time "Installing Compose file...DONE"
+    if [ ! -f $INSTALL_LOCATION/docker-compose.yml ]; then
+        echo_time "Installing Compose file.."
+        cp docker-compose.yml.template $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s/<-%INSTALL_LOCATION%->/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s/<-%MEDIA_LOCATION%->/MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+        echo_time "Installing Compose file...DONE"
+    fi
 
-    sudo chmod +x set-port.sh
+    if [ ! -f $INSTALL_LOCATION/init/scripts/set-port.sh ]; then
+        cp set-port.sh $INSTALL_LOCATION/init/scripts/set-port.sh
+        sudo chmod +x $INSTALL_LOCATION/init/scripts/set-port.sh
+    fi
     #sudo chmod -R ug+rw $INSTALL_LOCATION
-    cp set-port.sh $INSTALL_LOCATION/init/scripts/set-port.sh
-
     echo_time "Creating Workspace...DONE"
 }
 
