@@ -32,8 +32,8 @@ function setUpWorkspace () {
     if [ ! -f $INSTALL_LOCATION/docker-compose.yml ]; then
         echo_time "Installing Compose file.."
         cp docker-compose.yml.template $INSTALL_LOCATION/docker-compose.yml
-        sed -i "s/INSTALL_LOCATION/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
-        sed -i "s/MEDIA_LOCATION/$MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s|INSTALL_LOCATION|$INSTALL_LOCATION|g" $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s|MEDIA_LOCATION|$MEDIA_LOCATION|g" $INSTALL_LOCATION/docker-compose.yml
         echo_time "Installing Compose file...DONE"
     fi
 
