@@ -4,9 +4,9 @@ services:
     image: thrnz/docker-wireguard-pia
     volumes:
         # Auth token is stored here
-        - ~/docker-config/pia:/pia
+        - <-%INSTALL_LOCATION%->/pia:/pia
         # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
-        - ~/docker-config/transmission:/pia-shared
+        - <-%INSTALL_LOCATION%->/transmission:/pia-shared
     cap_add:
         - NET_ADMIN
         # SYS_MODULE might not be needed with a 5.6+ kernel?
@@ -55,10 +55,10 @@ services:
       - TZ=America/Chicago
       - TRANSMISSION_WEB_HOME=/transmission-web-control/
     volumes:
-      - ~/docker-config/transmission:/config
-      - /media/storage/downloads:/downloads
-      - /media/storage/downloads/watch:/watch
-      - ~/docker-config/init/scripts:/config/custom-cont-init.d
+      - <-%INSTALL_LOCATION%->/transmission:/config
+      - <-%MEDIA_LOCATION%->/downloads:/downloads
+      - <-%MEDIA_LOCATION%->/downloads/watch:/watch
+      - <-%INSTALL_LOCATION%->/init/scripts:/config/custom-cont-init.d
     restart: "no"
   sonar:
     image: linuxserver/sonarr
@@ -69,9 +69,9 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - ~/docker-config/sonarr:/config
-      - /media/storage/tv:/tv
-      - /media/storage/downloads:/downloads
+      - <-%INSTALL_LOCATION%->/sonarr:/config
+      - <-%MEDIA_LOCATION%->/tv:/tv
+      - <-%MEDIA_LOCATION%->/downloads:/downloads
     restart: "no"
   radarr:
     image: linuxserver/radarr
@@ -82,9 +82,9 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - ~/docker-config/radarr:/config
-      - /media/storage/movie:/movies
-      - /media/storage/downloads:/downloads
+      - <-%INSTALL_LOCATION%->/radarr:/config
+      - <-%MEDIA_LOCATION%->/movie:/movies
+      - <-%MEDIA_LOCATION%->/downloads:/downloads
     restart: "no"
   bazarr:
     image: linuxserver/bazarr
@@ -95,9 +95,9 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - ~/docker-config/bazarr:/config
-      - /media/storage/movie:/movies
-      - /media/storage/tv:/tv
+      - <-%INSTALL_LOCATION%->/bazarr:/config
+      - <-%MEDIA_LOCATION%->/movie:/movies
+      - <-%MEDIA_LOCATION%->/tv:/tv
     restart: "no"
   jackett:
     image: linuxserver/jackett
@@ -108,8 +108,8 @@ services:
       - PGID=1000
       - TZ=America/Chicago
     volumes:
-      - ~/docker-config/jackett:/config
-      - /media/storage/downloads:/downloads
+      - <-%INSTALL_LOCATION%->/jackett:/config
+      - <-%MEDIA_LOCATION%->/downloads:/downloads
     restart: "no"
   mylar:
     image: linuxserver/mylar
@@ -119,7 +119,7 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - ~/docker-config/mylar:/config
-      - /media/storage/comics:/comics
-      - /media/storage/downloads:/downloads
+      - <-%INSTALL_LOCATION%->/mylar:/config
+      - <-%MEDIA_LOCATION%->/comics:/comics
+      - <-%MEDIA_LOCATION%->/downloads:/downloads
     restart: "no"

@@ -1,17 +1,16 @@
 #!/bin/bash
 
-# Download Box Set Up
+# Docker-Downloader Set Up
 
-# To run when box starts:
-# Make sure script is executable
-# run 'crontab -e'
-# add '@reboot sleep 10 && /home/downloadbox/docker-config/init/startseedbox.sh' to the crontab
-# ????
-# profit
+# Ensure script is executable
+# $ crontab -e
+# add @reboot sleep 5 && /home/user/Docker-Downloader/init.sh /home/user/docker-config to the crontab
+# This will start the stack at boot.
 
-#Constants
-PATH_TO_DOCKER_CONFIG=${1:-"~/docker-config"}
-echo "Path to Docker Config: $PATH_TO_DOCKER_CONFIG"
+INSTALL_LOCATION=${1:-"~/docker_downloader_home"}
+MEDIA_LOCATION=${2:-"/media/storage"}
+echo "Path to Docker Config: $INSTALL_LOCATION"
+
 echo_time() {
     date +"%H:%M $(printf "%s " "$@" | sed 's/%/%%/g')"
 }
@@ -20,67 +19,54 @@ function setUpWorkspace () {
     echo_time "Creating Workspace.."
 
     echo_time "Creating directory structure.."
-    mkdir -p $PATH_TO_DOCKER_CONFIG/init/scripts
-    mkdir -p $PATH_TO_DOCKER_CONFIG/jackett
-    mkdir -p $PATH_TO_DOCKER_CONFIG/pia
-    mkdir -p $PATH_TO_DOCKER_CONFIG/radarr
-    mkdir -p $PATH_TO_DOCKER_CONFIG/sonarr
-    mkdir -p $PATH_TO_DOCKER_CONFIG/bazarr
-    mkdir -p $PATH_TO_DOCKER_CONFIG/mylar
-    mkdir -p $PATH_TO_DOCKER_CONFIG/transmission
+    mkdir -p $INSTALL_LOCATION/init/scripts
+    mkdir -p $INSTALL_LOCATION/jackett
+    mkdir -p $INSTALL_LOCATION/pia
+    mkdir -p $INSTALL_LOCATION/radarr
+    mkdir -p $INSTALL_LOCATION/sonarr
+    mkdir -p $INSTALL_LOCATION/bazarr
+    mkdir -p $INSTALL_LOCATION/mylar
+    mkdir -p $INSTALL_LOCATION/transmission
     echo_time "Creating directory structure...DONE"
 
-    #sudo chmod +x set-port.sh
-    #sudo chmod -R ug+rw $PATH_TO_DOCKER_CONFIG
-    cp set-port.sh $PATH_TO_DOCKER_CONFIG/init/scripts/set-port.sh
+    echo_time "Installing Compose file.."
+    cp docker-compose.yml.template $INSTALL_LOCATION/docker-compose.yml
+    sed -i "s/<-%INSTALL_LOCATION%->/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+    sed -i "s/<-%MEDIA_LOCATION%->/MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+    echo_time "Installing Compose file...DONE"
+
+    sudo chmod +x set-port.sh
+    #sudo chmod -R ug+rw $INSTALL_LOCATION
+    cp set-port.sh $INSTALL_LOCATION/init/scripts/set-port.sh
 
     echo_time "Creating Workspace...DONE"
 }
 
-function cleanUp () {
-    echo_time "Stopping containers.."
-    docker stop $(docker ps -aq) > /dev/null
-    echo_time "Stopping containers...DONE"
-
-    echo_time "Removing all containers.."
-    docker rm $(docker ps -aq)
-    echo_time "Removing all containers...DONE"
-
-    # echo_time "Removing all images.."
-    # docker rmi $(docker images -q)
-    # echo_time "Removing all images...DONE"
-}
-
 function startContainers () {
     echo_time "Updating and starting containers.."
-    docker-compose up -d
+    docker-compose -f $INSTALL_LOCATION/docker-compose.yml up --force-recreate --build -d
+    docker image prune -f
     echo_time "Updating and starting containers...DONE"
 }
 
-
-function init () {
-    oldPort=0
-    if test -f "$PATH_TO_DOCKER_CONFIG/transmission/port.dat";
-    then
-        oldPort=$(cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat)
-        rm $PATH_TO_DOCKER_CONFIG/transmission/port.dat
-    fi
-
-    startContainers
-    echo_time "Forwarding Port.."
-    while [ ! -f $PATH_TO_DOCKER_CONFIG/transmission/port.dat ]
-    do
-        sleep 1
-        echo_time "Checking Port Forwarding status..."
-    done
-    docker restart transmission
-    echo_time "Forwarding Port...DONE"
-
-    newPort=`cat $PATH_TO_DOCKER_CONFIG/transmission/port.dat`
-    echo "Old Port: " $oldPort
-    echo "New Port: " $newPort
-}
-
 setUpWorkspace
-cleanUp
-init
+oldPort=0
+if test -f "$INSTALL_LOCATION/transmission/port.dat";
+then
+    oldPort=$(cat $INSTALL_LOCATION/transmission/port.dat)
+    rm $INSTALL_LOCATION/transmission/port.dat
+fi
+
+startContainers
+echo_time "Forwarding Port.."
+while [ ! -f $INSTALL_LOCATION/transmission/port.dat ]
+do
+    sleep 1
+    echo_time "Checking Port Forwarding status..."
+done
+docker restart transmission
+echo_time "Forwarding Port...DONE"
+
+newPort=`cat $INSTALL_LOCATION/transmission/port.dat`
+echo "Old Port: " $oldPort
+echo "New Port: " $newPort
