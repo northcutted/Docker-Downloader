@@ -4,7 +4,7 @@
 
 # Ensure script is executable
 # $ crontab -e
-# add @reboot sleep 5 && /home/user/Docker-Downloader/init.sh /home/user/docker-config to the crontab
+# add @reboot sleep 5 && /path/to/init.sh INSTALL_LOCATION  MEDIA_LOCATION to the crontab
 # This will start the stack at boot.
 
 INSTALL_LOCATION=${1:-"~/docker_downloader_home"}
@@ -32,8 +32,8 @@ function setUpWorkspace () {
     if [ ! -f $INSTALL_LOCATION/docker-compose.yml ]; then
         echo_time "Installing Compose file.."
         cp docker-compose.yml.template $INSTALL_LOCATION/docker-compose.yml
-        sed -i "s/<-%INSTALL_LOCATION%->/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
-        sed -i "s/<-%MEDIA_LOCATION%->/MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s/INSTALL_LOCATION/$INSTALL_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
+        sed -i "s/MEDIA_LOCATION/$MEDIA_LOCATION/g" $INSTALL_LOCATION/docker-compose.yml
         echo_time "Installing Compose file...DONE"
     fi
 
