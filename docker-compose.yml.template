@@ -1,0 +1,126 @@
+version: "3.7"
+services:
+  vpn:
+  # See: https://github.com/thrnz/docker-wireguard-pia
+    image: thrnz/docker-wireguard-pia:latest
+    volumes:
+        # Auth token is stored here
+        - INSTALL_LOCATION/pia:/pia
+        # If enabled, the forwarded port is dumped to /pia-shared/port.dat for potential use in other containers
+        - INSTALL_LOCATION/transmission:/pia-shared
+    cap_add:
+        - NET_ADMIN
+        # SYS_MODULE might not be needed with a 5.6+ kernel?
+        - SYS_MODULE
+    ports:
+        - 8888:8888/tcp
+        - 8388:8388/tcp
+        - 8388:8388/udp
+        - 9091:9091
+        - 7878:7878
+        - 6767:6767
+        - 8989:8989
+        - 8090:8090
+        - 9117:9117
+    environment:
+       # - LOCAL_NETWORK=192.168.1.0/24
+        - LOC=ca_ontario
+        - USER=
+        - PASS=
+        #- KEEPALIVE=25
+        - PORT_FORWARDING=1
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Chicago
+    sysctls:
+        # wg-quick fails to set this without --privileged, so set it here instead if needed
+        - net.ipv4.conf.all.src_valid_mark=1
+        # May as well disable ipv6. Should be blocked anyway.
+        - net.ipv6.conf.default.disable_ipv6=1
+        - net.ipv6.conf.all.disable_ipv6=1
+        - net.ipv6.conf.lo.disable_ipv6=1
+    # The container has no recovery logic. Use a healthcheck to catch disconnects.
+    healthcheck:
+        test: ping -c 1 www.google.com || exit 1
+        interval: 30s
+        timeout: 10s
+        retries: 3
+    restart: "no"
+  transmission:
+    image: linuxserver/transmission:latest
+    container_name: transmission
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - TRANSMISSION_WEB_HOME=/transmission-web-control/
+    volumes:
+      - INSTALL_LOCATION/transmission:/config
+      - MEDIA_LOCATION/downloads:/downloads
+      - MEDIA_LOCATION/downloads/watch:/watch
+      - INSTALL_LOCATION/init/scripts:/config/custom-cont-init.d
+    restart: "no"
+  sonar:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - INSTALL_LOCATION/sonarr:/config
+      - MEDIA_LOCATION/tv:/tv
+      - MEDIA_LOCATION/downloads:/downloads
+    restart: "no"
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - INSTALL_LOCATION/radarr:/config
+      - MEDIA_LOCATION/movie:/movies
+      - MEDIA_LOCATION/downloads:/downloads
+    restart: "no"
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - INSTALL_LOCATION/bazarr:/config
+      - MEDIA_LOCATION/movie:/movies
+      - MEDIA_LOCATION/tv:/tv
+    restart: "no"
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - INSTALL_LOCATION/jackett:/config
+      - MEDIA_LOCATION/downloads:/downloads
+    restart: "no"
+  mylar:
+    image: linuxserver/mylar:latest
+    container_name: mylar
+    network_mode: "service:vpn"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - INSTALL_LOCATION/mylar:/config
+      - MEDIA_LOCATION/comics:/comics
+      - MEDIA_LOCATION/downloads:/downloads
+    restart: "no"

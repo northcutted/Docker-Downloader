@@ -1,7 +1,10 @@
-# Docker-Downloader
-Script to setup download box
+# Docker Downloader
+
+## Sets up everything you need to download linux distros.
+
+Requires: Docker, Docker-Compose
 
 Usage:
-```bash
-./start_download_box.sh [path-to-docker-config] [pia_user] [pia_password]
+```shell
+init.sh path/to/install/location path/to/media/storage/location
 ```
