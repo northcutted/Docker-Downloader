@@ -43,6 +43,7 @@ function setUpWorkspace () {
 
 function startContainers () {
     echo_time "Updating and starting containers.."
+    docker-compose -f $INSTALL_LOCATION/docker-compose.yml down
     docker-compose -f $INSTALL_LOCATION/docker-compose.yml up --force-recreate --build -d
     docker image prune -f
     echo_time "Updating and starting containers...DONE"
@@ -53,7 +54,7 @@ oldPort=0
 if test -f "$INSTALL_LOCATION/transmission/port.dat";
 then
     oldPort=$(cat $INSTALL_LOCATION/transmission/port.dat)
-    rm $INSTALL_LOCATION/transmission/port.dat
+    rm -rf $INSTALL_LOCATION/transmission/port.dat
 fi
 
 startContainers
